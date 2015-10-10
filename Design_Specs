@@ -1,0 +1,41 @@
+Initial Page:
+	GAME TITLE
+
+
+Your name here:			___________<<//what user types=$Name. Default: John Smith>>
+Your preferred pronoun here: 	___________<<//what user types=$preferred prounoun. Default: Mr. >>
+Choose a county:		<<Drop down menu: Jimmy's counties $county=chosen one>>
+Or: 				<<BUTTON: Select one at random (default: random) $county=random>>
+
+Choose a difficulty:
+	<<RADIOBUTTON: EASY    $numWeeks=20>>
+	<<RADIOBUTTON: MEDIUM  $numWeeks=10 (default)>>
+	<<RADIOBUTTON: HARD    $numWeeks=5>>
+
+<<CONTINUE: Load second page>>
+
+Second Page:
+          Game title
+Dear $Pronoun $Name,
+
+Congratulations on officially starting your campaign for $Position in $county County.
+
+The election is in $numWeeks weeks. 
+
+During each week, a reporter will present you with a statement about an issue important to the community, and you will have to give a speech about the statement,
+indicating whether you strongly agree with it, strongly disagree with it, or are somewhere in the middle.
+
+Each stance you take will win you some voters and lose some others.
+
+After $numWeeks weeks, the population will vote, and if you win at least 51% of the vote, you win the election!
+
+Good luck!
+
+<BUTTON: BEGIN (load main game)>
+
+Main game:
+       Game title
+    Map       History
+    Map       History
+    Map       History
+    Next Prompt Here

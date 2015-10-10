@@ -115,7 +115,7 @@ $(document).ready(function(){
 		questionArray[i] = allQuesitons[index];
 		allQuesitons.splice(index, 1);
 	}
-	var board = new GameController($("#controller"), questionArray);
+	var board = new GameController($("#question"), questionArray[0]);
 	
 	board.updateData(importanceOfIssues, politicalOpinions, politicalGroups);
 
@@ -126,39 +126,63 @@ $(document).ready(function(){
 
 		});
 	}
+
+
+	var selection;
+
+	$(":radio").click(function(){
+		selection = this.value;
+		console.log(selection);
+	});
+
+	$("#select-option").click(function(){
+		var questionSpace = $("#current-question");
+		var prevQuestion = questionArray.splice(0,1);
+		$("#history").append("<div>"+prevQuestion+"</div>  <div>"+selection+"</div>")
+		questionSpace.empty();
+		questionSpace.append(questionArray[0]);
+		$(':radio').removeAttr('checked');
+		// Refresh the jQuery UI buttonset.                  
+		$( ":radio" ).buttonset('refresh');
+	})
+
+
+
+
+	
+
 	
 });
 
 
 
-var GameController = function(controllerDiv,questionArray){
+var GameController = function(controllerDiv,mostImportantQuestion){
 	this.controllerDiv = controllerDiv;
-	this.questionArray = questionArray;
-	for(var i = 0; i < questionArray.length; i++){
-		var questionDiv = $("<div class='form form"+i+"'><form id=\"question"+i+"\">"+questionArray[i]+"<br></form></div>");
+	//this.questionArray = questionArray;
+		var questionDiv = $("#question");
+
 		controllerDiv.append(questionDiv);
+		questionDiv.append("<div id='current-question'>"+mostImportantQuestion + "</div><br>");
 
+		questionDiv.append("<input type='radio' class='question' name='question' value='strongly-disagree' id='strongly-disagree'>");
+		questionDiv.append("<label for='strongly-disagree'><span></span>Strongly Disagree</label><br>");
 
-		questionDiv.append("<input type='radio' class='question"+i+"' name='question"+i+"' value='strongly-disagree' id='strongly-disagree"+i+"'>");
-		questionDiv.append("<label for='strongly-disagree"+i+"'><span></span>Strongly Disagree</label><br>");
+		questionDiv.append("<input type='radio' class='question' name='question' value='disagree' id='disagree'>");
+		questionDiv.append("<label for='disagree'><span></span>Disagree</label><br>");
 
-		questionDiv.append("<input type='radio' class='question"+i+"' name='question"+i+"' value='disagree' id='disagree"+i+"'>");
-		questionDiv.append("<label for='disagree"+i+"'><span></span>Disagree</label><br>");
+		questionDiv.append("<input type='radio' class='question' name='question' value='neutral' id='neutral'>");
+		questionDiv.append("<label for='neutral'><span></span>Neutral</label><br>");
 
-		questionDiv.append("<input type='radio' class='question"+i+"' name='question"+i+"' value='neutral' id='neutral"+i+"'>");
-		questionDiv.append("<label for='neutral"+i+"'><span></span>Neutral</label><br>");
+		questionDiv.append("<input type='radio' class='question' name='question' value='agree' id='agree'>");
+		questionDiv.append("<label for='agree'><span></span>Agree</label><br>");
 
-		questionDiv.append("<input type='radio' class='question"+i+"' name='question"+i+"' value='agree' id='agree"+i+"'>");
-		questionDiv.append("<label for='agree"+i+"'><span></span>Agree</label><br>");
-
-		questionDiv.append("<input type='radio' class='question"+i+"' name='question"+i+"' value='strongly-agree' id='strongly-agree"+i+"'>");
-		questionDiv.append("<label for='strongly-agree"+i+"'><span></span>Strongly Agree</label><br><br>");
-	}
+		questionDiv.append("<input type='radio' class='question' name='question' value='strongly-agree' id='strongly-agree'>");
+		questionDiv.append("<label for='strongly-agree'><span></span>Strongly Agree</label><br><br>");
 }
 
-/*GameController.prototype.updateData(importanceOfIssues, politicalOpinions, politicalGroups){
+GameController.prototype.updateData = function(importanceOfIssues, politicalOpinions, politicalGroups){
 	this.importanceOfIssues = importanceOfIssues;
-}*/
+}
 
 /*require(["esri/map", "dojo/domReady!"], function(Map) { 
   var map = new Map("map", {
@@ -172,5 +196,125 @@ var Question = function(questionString){
 	this.quesitonString = questionString;
 	this.answerArray = answerArray;
 
+}
+
+//Bad practice stuff beyond
+
+function OhDidIWin(numMoves, pop, issues, importanceOfIssues){
+	var wonOver = [];
+	var spokenOn = [];
+	var importance = [];
+	var currentVotes;
+	var importantIssue;
+	var totalVotes;
+	var opinion;
+	var move=0;
+	for(var groupNum=0; groupNum<pop.length; groupNum++){
+		wonOver[i]=0;
+	}
+	for(var issueNum=0; issueNum<issues.length; issueNum++){
+		spokenOn[issueNum]=0;
+		importance[issueNum]=0;
+		for(var groupNum=0; groupNum<pop.length; groupNum++){
+			importance[issueNum]+=Math.abs(importanceOfIssues[issueNum][groupNum])*pop[groupNum];
+			//REMEMBER: IoI[issueNum][groupNum]
+			//This is roughly the percentage of people, regardless of voting group, for which
+			//a given issue is the most important issue
+	
+		}
+	}
+
+	currentVotes=0;
+	importantIssue=0;
+	
+	//calculate the next most important issue
+	for(var issueNum=0; issueNum<issues.length; issueNum++){
+		if(!spokenOn[issueNum] && importance[issueNum]>importance[importantIssue]){
+			importantIssue=issueNum;
+		}
+	}
+
+	writeNextPrompt(currentVotes,importantIssue);
+
+	//this is the meat of the function, the loop that repeatedly queries the user for their opinions
+	for(move = 0; move<numMoves; move++){
+		opinion=getOpinion();
+		spokenOn[importantIssue]=true;
+		wonOver=updateWinnings(wonOver,importanceOfIssues[keyPoint],opinion);
+
+		currentVotes=0;
+		for(var groupNum=0; groupNum<pop.length; groupNum++){
+			currentVotes+=wonOver[groupNum]*pop[groupNum];
+		}
+		
+		importantIssue=0;
+		for(var issueNum=0; issueNum<issues.length; issueNum++){
+			if(!spokenOn[issueNum] && importance[issueNum]>importance[importantIssue]){
+				importantIssue=issueNum;
+			}
+		}
+		
+		writeNextPrompt(currentVotes, numMoves-moves, issues[importantIssue],importantIssue);
+		
+	}
+	totalVotes=0;
+	for(var groupNum=0; groupNum<pop.length; groupNum++){
+		totalVotes+=wonOver[groupNum]*pop[groupNum];
+	}
+
+	if(totalVotes>0.5){
+		writeFinalOutput("success", totalVotes);
+	}
+	else{
+		writeFinalOutput("failure",totalVotes);
+	}
+}
+
+function updateWinnings(wonOver, importanceOfIssues, opinion){
+	var temp;
+	for(var groupNum=0; groupNum<wonOver.size; groupNum++){
+		temp=(1-wonOver[groupNum])*(importantofIssues[groupNum])*(opinion);
+		//1-wonOver[groupNum] is the percentage of people who haven't already pledged their vote for you
+		//ImportanceOfIssues[groupNum] is the percentage of people in the group who consider that issue the most important one
+		//opinion is your degree of support towards the issue
+		wonOver[groupNum]+=temp;
+	}
+	return wonOver;
+}
+ 
+function getOpinion(){
+	//Java script to connect to the page and get whatever button they pressed
+	return opinion;
+}
+
+function writeNextPrompt(currentVotes, remainingMoves, issue, importantIssue){
+	//Print the following string (not sure how to do this)
+	/*return "You currently have $currentVotes% of the population voting for you.
+	You have "+remainingMoves+" moves left. 
+	The next most important issue is $issue, which is the most important issue for $importantIssue% of the population.
+	So, how do you feel about "+issue+"?";*/
+
+
+	//Button prompts
+	//Map diagram
+}
+
+function logCurrentQuestion(currentQuestion, response){
+
+}
+	
+function writeFinalOutput(outcome, totalVotes){
+	if(outcome=="success"){
+		//Print the following string (not sure how to do this)
+		//console.log( "Congratulations, you win, with "+totalVotes+"\% of the votes." );
+		$("#controller").empty();
+		$("#controller").append("Congratulations, you win, with "+totalVotes+"% of the votes.");
+	}
+	else{
+		//Print the following string (not sure how to do this)
+		console.log("Too bad, you lose. You got "+totalVotes+"% of the votes, less than the 51% necessary to win.");
+		$("#controller").empty();
+		$("#controller").append("Too bad, you lose. You got "+totalVotes+"% of the votes, less than the 51% necessary to win.");
+	}	
 }
 

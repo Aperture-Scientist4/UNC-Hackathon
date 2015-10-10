@@ -135,16 +135,24 @@ $(document).ready(function(){
 		console.log(selection);
 	});
 
+	var moves = 0;
+	var wonOver = 0;
+
 	$("#select-option").click(function(){
 		var questionSpace = $("#current-question");
 		var prevQuestion = questionArray.splice(0,1);
 		$("#history").append("<div>"+prevQuestion+"</div>  <div>"+selection+"</div>")
+
 		questionSpace.empty();
 		questionSpace.append(questionArray[0]);
 		$(':radio').removeAttr('checked');
 		// Refresh the jQuery UI buttonset.                  
-		$( ":radio" ).buttonset('refresh');
-	})
+		//$( ":radio" ).buttonset('refresh');
+		moves++;
+		if(questionArray.length == 0){
+			OhDidIWin(numMoves, wonOver)
+		}
+	});
 
 
 
@@ -263,10 +271,10 @@ function OhDidIWin(numMoves, pop, issues, importanceOfIssues){
 	}
 
 	if(totalVotes>0.5){
-		writeFinalOutput("success", totalVotes);
+		writeFinalOutput("success", totalVotes*100);
 	}
 	else{
-		writeFinalOutput("failure",totalVotes);
+		writeFinalOutput("failure",totalVotes*100);
 	}
 }
 

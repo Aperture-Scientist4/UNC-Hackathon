@@ -207,7 +207,13 @@ var Question = function(questionString){
 }
 
 //Bad practice stuff beyond
-
+//@params:
+//numMoves: integer number of weeks the game lasts
+//pop: a float array of size numPopGroups, consisting of the percentage of the population that is in each population group
+//issues: a String array consisting of the different issues the politician may potentially make an opinion about. 
+//May not be necessary because of the array allQuestions
+//importanceOfIssues: a 2D float array, of size [numIssues][numPopGroups], consisting of the importance of each issue to 
+//the members of the population groups
 function OhDidIWin(numMoves, pop, issues, importanceOfIssues){
 	var wonOver = [];
 	var spokenOn = [];
@@ -278,6 +284,10 @@ function OhDidIWin(numMoves, pop, issues, importanceOfIssues){
 	}
 }
 
+//@params:
+//wonOver: float array (declared in OhDidIWin), consiting of the 
+//importanceOfIssues: float array, consisting of one collumn of the importanceOfIssues 2D array--the opinion of all the pop groups on one issue
+//opinion: the opinion of the politician on the issue in question
 function updateWinnings(wonOver, importanceOfIssues, opinion){
 	var temp;
 	for(var groupNum=0; groupNum<wonOver.size; groupNum++){

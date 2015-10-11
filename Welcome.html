@@ -1,0 +1,96 @@
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <!--The viewport meta tag is used to improve the presentation and behavior of the samples 
+      on iOS devices-->
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no">
+    <title>Query State Info without Map</title>
+
+    <script src="http://js.arcgis.com/3.14/"></script>
+	<script src="http://code.jquery.com/jquery-2.1.4.min.js"></script>
+    <script>
+    	var value;
+		var difficulty;
+		var fullGreeting;
+		var weeksamount;
+		
+		$(document).ready(function(){
+			$("div").hide();
+		}
+		
+		function execute () {
+			$("#name").focus();
+			fullGreeting = document.getElementById("userInput").value + " " + $("#name").select()+",";
+			$("#greeting").text("Dear "+fullGreeting +"<br>");
+			
+			$("#secondsentence").text("Congratulations on officially starting your campaign for mayor in " + $(#value) + " County.<br>");
+			
+			if ($("#difficulty")==="easy"){
+				weeksamount=20;
+			}
+			else if ($("#difficulty")==="medium"){
+				weeksamount=10;
+			}
+			else {
+				weeksamount=5;
+			}
+			
+			$("#thirdsentence").text("The election is in " + weeksamount + " weeks.<br>");
+			$("#lastsentence").text("After " weeksamount + " weeks, the population will vote, and if you win at least 51% of the vote, you win the election!<br>");
+			
+			$("div").show();
+        }
+		
+    </script>
+  </head>
+
+  <body>
+	<b>Welcome!</b><br>
+	Your name here:	<input type="text" id="name"> <!-- Default: John Smith !--><br>
+	Your preferred pronoun here: <input type="text" id="pronoun"><br>
+	Choose a county: 
+	<select>
+	<option value="losangeles">Los Angeles</option>
+	<option value="cook">Cook</option>
+	<option value="harris">Harris</option>
+	<option value="maricopa">Maricopa</option>
+	<option value="sandiego">San Diego</option>
+	<option value="orange">Orange</option>
+	<option value="miami-dade">Miami-Dade</option>
+	<option value="kings">Kings</option>
+	<option value="dallas">Dallas</option>
+	<option value="queens">Queens</option>
+	<option value="riverside">Riverside</option>
+	<option value="sanbernardino">San Bernardino</option>
+	<option value="king">King</option>
+	<option value="clark">Clark</option>
+	<option value="tarrant">Tarrant</option>
+	<option value="santaclara">Santa Clara</option>
+	<option value="broward">Broward</option>
+	<option value="bexar">Bexar</option>
+	<option value="wayne">Wayne</option>
+	<option value="newyork">New York</option>	
+	</select><br>
+	
+	Choose a difficulty:
+	<select>
+	<option difficulty="easy">Easy</option>
+	<option difficulty="medium">Medium</option>
+	<option difficulty="hard">Hard</option>
+	</select><br>
+	
+	<input id="continue" type="button" value="Continue" onclick="execute()">
+	
+	<div id="secondpage">
+		<div id="greeting"></div>
+		<div id ="secondsentence"></div>
+		<div id = "thirdsentence"></div>
+		During each week, a reporter will present you with a statement about an issue important to the community, and you will have to give a speech about the statement,
+indicating whether you strongly agree with it, strongly disagree with it, or are somewhere in the middle.<br>
+		Each stance you take will win you some voters and lose some others.<br>
+		<div id ="lastsentence"></div>
+		Good luck!
+	</div>
+	
+  </body>
+</html>

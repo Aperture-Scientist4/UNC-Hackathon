@@ -10,8 +10,8 @@
 	<script src="http://code.jquery.com/jquery-2.1.4.min.js"></script>
     <script>
     
-	var counties = ["Los Angeles", "Cook", "Harris", "Maricopa", "San Diego", "Orange", "Miami-Dade", "Kings", "Dallas", "Queens", "Riverside", ""San Bernardino", "King", "Clark", "Tarrant", "Santa Clara", "Broward", "Bexar", "Wayne", "New York"];
-	var randomNum = Math.floor(10*Math.random());
+	var counties = ["Los Angeles", "Cook", "Harris", "Maricopa", "San Diego", "Orange", "Miami-Dade", "Kings", "Dallas", "Queens", "Riverside", "San Bernardino", "King", "Clark", "Tarrant", "Santa Clara", "Broward", "Bexar", "Wayne", "New York"];
+	var randomNum = Math.floor(20*Math.random());
 	var randomCounty = counties[randomNum];
 	  
 	require([
@@ -46,7 +46,40 @@
           }
         }
 	});
-	  
+	
+	require([
+        "dojo/dom", "dojo/on",
+        "esri/tasks/query", "esri/tasks/QueryTask", "dojo/domReady!"
+    ], function (dom, on, Query, QueryTask) {
+
+        var queryTask = new QueryTask("http://demographics5.arcgis.com/arcgis/rest/services/USA_Consumer_Expenditures_2015/MapServer/15");
+
+        var query = new Query();
+        query.returnGeometry = false;
+        query.outFields = [
+          "X11001_I", "X4003_I"
+        ];
+
+        on(dom.byId("execute"), "click", execute);
+
+        function execute () {
+          query.text = randomCounty;
+          queryTask.execute(query, showResults);
+        }
+
+        function showResults (results) {
+			var resultItems = [];
+			var resultCount = results.features.length;
+			for (var i = 0; i < resultCount; i++) {
+				var featureAttributes = results.features[i].attributes;
+            for (var attr in featureAttributes) {
+				$("#info").append("<b>" + attr + ":</b>  " + featureAttributes[attr] + "<br>");
+            }
+            resultItems.push("<br>");
+          }
+        }
+	});
+	
 	  
     </script>
   </head>

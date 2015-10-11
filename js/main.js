@@ -77,6 +77,26 @@ importanceOfIssues = [
     }
 ]
 
+importanceOfIssuesArr = new Array(new Array());
+var xLen = 0; 
+var yLen = 0;
+
+for(var x in importanceOfIssues) { 
+	if (importanceOfIssues.hasOwnProperty(x)){
+		importanceOfIssues.push
+    	for(var y in importanceOfIssues[x]) {
+			if (importanceOfIssues[x].hasOwnProperty(y)) {
+				importanceOfIssuesArr[xLen].push( importanceOfIssues[x][y]);
+				yLen++;
+      		}
+    	}
+
+		xLen++;
+    	importanceOfIssuesArr.push(new Array());
+	}
+}
+//console.log(importanceOfIssuesArr);
+
 politicalOpinions = [
     {
         "Our prison system is too harsh on misdemeanors. ": "1",
@@ -102,6 +122,12 @@ politicalGroups = [
     }
 ]
 
+politicalGroups = politicalGroups[0];
+politicalGroupsArr = new Array();
+
+for(var i in politicalGroups){
+	politicalGroupsArr.push(parseFloat(politicalGroups[i]));
+}
 
 
 $(document).ready(function(){
@@ -109,13 +135,14 @@ $(document).ready(function(){
 	for(var i = 0; i < 20; i++){
 		allQuesitons[i] = "Question "+i;
 	}*/
-	var questionArray = new Array(String);
-	for(var i = 0; i < 5; i++){
-		var index = Math.floor(Math.random() * allQuesitons.length);
-		questionArray[i] = allQuesitons[index];
-		allQuesitons.splice(index, 1);
-	}
-	var board = new GameController($("#question"), questionArray[0]);
+	//var politicalGroupsArr = $.map(politicalGroups, function(el){ return el;});
+	console.log(politicalGroupsArr);
+	console.log(allQuesitons);
+	console.log( importanceOfIssuesArr );
+	var questionArray = importantQuestions(5, politicalGroupsArr, allQuesitons, importanceOfIssuesArr );//new Array(String);
+	console.log(questionArray );
+
+	var board = new GameController($("#question"), questionArray [0]);
 	
 	board.updateData(importanceOfIssues, politicalOpinions, politicalGroups);
 
@@ -138,12 +165,42 @@ $(document).ready(function(){
 	var moves = 0;
 	var wonOver = 0;
 
+	var wonOver = new Array();
+	for(var i = 0; i < politicalGroupsArr.length; i++){
+		wonOver.push(0.0);
+	}
+
 	$("#select-option").click(function(){
 		var questionSpace = $("#current-question");
 		var prevQuestion = questionArray.splice(0,1);
 		$("#history").append("<div>"+prevQuestion+"</div>  <div>"+selection+"</div>")
-
+		moves++;
 		questionSpace.empty();
+
+		var opinion = 0;
+
+		if(selection = "strongly-disagree"){
+			updateWinnings(moves, 5, wonOver, importanceOfIssuesArr, -1);
+		}
+
+		if(selection = "disagree"){
+			updateWinnings(moves, 5, wonOver, importanceOfIssuesArr, -.5);
+		}
+
+		if(selection = "neutral"){
+			updateWinnings(moves, 5, wonOver, importanceOfIssuesArr, 0);
+		}
+
+		if(selection = "strongly-agree"){
+			updateWinnings(moves, 5, wonOver, importanceOfIssuesArr, .5);
+		}
+
+		if(selection = "agree"){
+			updateWinnings(moves, 5, wonOver, importanceOfIssuesArr, 1);
+		}
+
+		
+
 		questionSpace.append(questionArray[0]);
 		$(':radio').removeAttr('checked');
 		// Refresh the jQuery UI buttonset.                  
@@ -212,20 +269,22 @@ var Question = function(questionString){
 //pop: a float array of size numPopGroups, consisting of the percentage of the population that is in each population group
 //issues: a String array consisting of the different issues the politician may potentially make an opinion about. 
 //May not be necessary because of the array allQuestions
-//importanceOfIssues: a 2D float array, of size [numIssues][numPopGroups], consisting of the importance of each issue to 
+//importanceOfIssues: a 2D float array, of size [numPopGroups][numIssues], consisting of the importance of each issue to 
 //the members of the population groups
-var importantQuestions = function(numMoves, pop, issues, importanceOfIssues){
-	importantQuesitons = new Array(String);
+function importantQuestions(numMoves, pop, issues, importanceOfIssues){
+	var out = new Array();
 	
-	var spokenOn = [];
+	//var spokenOn = [];
 	var importantIssue;
 	var importance=[];
 	
 	for(var issueNum=0; issueNum<issues.length; issueNum++){
-		spokenOn[issueNum]=0;
+	//	spokenOn[issueNum]=0;
 		importance[issueNum]=0;
 		for(var groupNum=0; groupNum<pop.length; groupNum++){
-			importance[issueNum]+=Math.abs(importanceOfIssues[issueNum][groupNum])*pop[groupNum];
+			importance[issueNum]+= Math.abs(
+				importanceOfIssues[groupNum][issueNum]
+				)*pop[groupNum];
 			//REMEMBER: IoI[issueNum][groupNum]
 			//This is roughly the percentage of people, regardless of voting group, for which
 			//a given issue is the most important issue
@@ -236,17 +295,32 @@ var importantQuestions = function(numMoves, pop, issues, importanceOfIssues){
 	importantIssue=0;
 	
 	//calculate the next most important issue
+	var popped = new Array();
+	for(var i = 0; i < issues.length; i++){
+		popped.push(true);
+	}
+	console.log(popped);
 	for(var moveNum=0; moveNum<numMoves; moveNum++){
-		importantIssue=0;
-		for(var issueNum=0; issueNum<issues.length; issueNum++){
-			if(!spokenOn[issueNum] && importance[issueNum]>importance[importantIssue]){
+		var importantIssue= 0;
+		var issueNum = 0;
+		var max = -100000000;
+		for(issueNum=0; issueNum<issues.length; issueNum++){
+
+			if( importance[issueNum]>max && popped[issueNum] == true){
 				importantIssue=issueNum;
+				max = importance[issueNum];
 			}
+
 		}
-		importantQuestions[moveNum]=issues[importantIssue];
-		spokenOn[importantIssue]=0;
+		popped[importantIssue] = false;
+		//console.log(importantIssue);
+		console.log(popped);
+		out[moveNum]=issues[importantIssue];
+		//spokenOn[importantIssue]=0;
 		//generates the ith most important issue
 	}
+
+	return out;
 }
 
 //@params:
@@ -258,15 +332,15 @@ var importantQuestions = function(numMoves, pop, issues, importanceOfIssues){
 function updateWinnings(buttonClicks, numMoves, wonOver, importanceOfIssues, opinion){
 	var temp;
 	for(var groupNum=0; groupNum<wonOver.size; groupNum++){
-		temp=(1-wonOver[groupNum])*(importantofIssues[groupNum])*(opinion);
+		temp=(1-wonOver[groupNum])*(importanceOfIssues[groupNum])*(opinion);
 		//1-wonOver[groupNum] is the percentage of people who haven't already pledged their vote for you
 		//ImportanceOfIssues[groupNum] is the percentage of people in the group who consider that issue the most important one
 		//opinion is your degree of support towards the issue
 		wonOver[groupNum]+=temp;
 	}
 	var totalVotes=0;
-	for(var groupNum=0; groupNum<pop.length; groupNum++){
-		totalVotes+=wonOver[groupNum]*pop[groupNum];
+	for(var groupNum=0; groupNum<wonOver.length; groupNum++){
+		totalVotes+=wonOver[groupNum]*politicalGroupsArr[groupNum];
 	}
 	if(buttonClicks==numMoves){
 		if(totalVotes>0.5){
@@ -278,7 +352,7 @@ function updateWinnings(buttonClicks, numMoves, wonOver, importanceOfIssues, opi
 	}
 	else{
 		writeNextPrompt(totalVotes, numMoves-buttonClicks);
-		
+	}
 }
  
 function getOpinion(){

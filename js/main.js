@@ -237,12 +237,14 @@ var importantQuestions = function(numMoves, pop, issues, importanceOfIssues){
 	
 	//calculate the next most important issue
 	for(var moveNum=0; moveNum<numMoves; moveNum++){
+		importantIssue=0;
 		for(var issueNum=0; issueNum<issues.length; issueNum++){
 			if(!spokenOn[issueNum] && importance[issueNum]>importance[importantIssue]){
 				importantIssue=issueNum;
 			}
 		}
 		importantQuestions[moveNum]=issues[importantIssue];
+		spokenOn[importantIssue]=0;
 		//generates the ith most important issue
 	}
 }
